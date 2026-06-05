@@ -24,10 +24,10 @@ struct StatusBarView: View {
             // Left Side: Page dimensions in millimeters
             HStack(spacing: 6) {
                 Image(systemName: "doc.plaintext")
-                    .foregroundColor(.secondary)
+                    .foregroundColor(SimplePDFDesign.ColorToken.secondaryText)
                 Text(pageDimensionsString)
-                    .font(.system(.caption, design: .monospaced))
-                    .foregroundColor(.secondary)
+                    .font(SimplePDFDesign.Typography.monoLabel())
+                    .foregroundColor(SimplePDFDesign.ColorToken.secondaryText)
             }
             
             Spacer()
@@ -77,7 +77,7 @@ struct StatusBarView: View {
                     }
                 } label: {
                     Text("\(Int(scaleFactor * 100))%")
-                        .font(.system(.caption, design: .monospaced))
+                        .font(SimplePDFDesign.Typography.monoLabel())
                         .frame(width: 48, alignment: .trailing)
                 }
                 .menuStyle(.borderlessButton)
@@ -111,7 +111,7 @@ struct StatusBarView: View {
                 if isEditingPage {
                     TextField("", text: $pageInputString)
                         .textFieldStyle(.plain)
-                        .font(.system(.caption, design: .monospaced))
+                        .font(SimplePDFDesign.Typography.monoLabel())
                         .frame(width: 35)
                         .multilineTextAlignment(.center)
                         .focused($isPageInputFocused)
@@ -128,25 +128,27 @@ struct StatusBarView: View {
                         }
                     
                     Text("of \(totalPages)")
-                        .font(.caption)
-                        .foregroundColor(.secondary)
+                        .font(SimplePDFDesign.Typography.label())
+                        .foregroundColor(SimplePDFDesign.ColorToken.secondaryText)
                 } else {
                     Button(action: startEditingPage) {
                         Text("Page \(currentPage) of \(totalPages)")
-                            .font(.system(.caption, design: .monospaced))
-                            .foregroundColor(.secondary)
+                            .font(SimplePDFDesign.Typography.monoLabel())
+                            .foregroundColor(SimplePDFDesign.ColorToken.secondaryText)
                     }
                     .buttonStyle(.plain)
                     .help("Click to jump to a page")
                 }
             }
         }
-        .padding(.horizontal, 12)
+        .padding(.horizontal, SimplePDFDesign.Space.md)
         .frame(height: 28)
-        .background(Color(NSColor.windowBackgroundColor))
+        .background(SimplePDFDesign.ColorToken.panelSoft)
         .overlay(
             VStack {
-                Divider()
+                Rectangle()
+                    .fill(SimplePDFDesign.ColorToken.divider)
+                    .frame(height: SimplePDFDesign.Stroke.hairline)
                 Spacer()
             }
         )

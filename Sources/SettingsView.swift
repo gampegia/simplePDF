@@ -129,7 +129,7 @@ struct ShortcutRecorder: View {
     var body: some View {
         HStack {
             Text(label)
-                .font(.body)
+                .font(SimplePDFDesign.Typography.body())
             Spacer()
             
             Button(action: {
@@ -140,17 +140,17 @@ struct ShortcutRecorder: View {
                 }
             }) {
                 Text(isRecording ? "Press keys..." : currentShortcut.displayString)
-                    .font(.system(.body, design: .monospaced))
+                    .font(.system(size: 13, weight: .semibold, design: .monospaced))
                     .fontWeight(.semibold)
-                    .foregroundColor(isRecording ? .accentColor : .primary)
+                    .foregroundColor(isRecording ? SimplePDFDesign.ColorToken.accent : SimplePDFDesign.ColorToken.text)
                     .padding(.horizontal, 10)
                     .padding(.vertical, 4)
                     .background(
-                        RoundedRectangle(cornerRadius: 6)
-                            .fill(isRecording ? Color.accentColor.opacity(0.12) : Color(NSColor.controlBackgroundColor))
+                        RoundedRectangle(cornerRadius: SimplePDFDesign.Radius.sm, style: .continuous)
+                            .fill(isRecording ? SimplePDFDesign.ColorToken.selectionFill : SimplePDFDesign.ColorToken.panelSoft)
                             .overlay(
-                                RoundedRectangle(cornerRadius: 6)
-                                    .stroke(isRecording ? Color.accentColor : Color.gray.opacity(0.2), lineWidth: 1)
+                                RoundedRectangle(cornerRadius: SimplePDFDesign.Radius.sm, style: .continuous)
+                                    .stroke(isRecording ? SimplePDFDesign.ColorToken.accent : SimplePDFDesign.ColorToken.divider, lineWidth: SimplePDFDesign.Stroke.hairline)
                             )
                     )
             }
@@ -159,7 +159,7 @@ struct ShortcutRecorder: View {
             if !isRecording && currentShortcut != defaultShortcut {
                 Button(action: resetToDefault) {
                     Image(systemName: "arrow.counterclockwise")
-                        .foregroundColor(.secondary)
+                        .foregroundColor(SimplePDFDesign.ColorToken.secondaryText)
                 }
                 .buttonStyle(.plain)
                 .help("Reset to default")
@@ -246,17 +246,17 @@ struct SettingsView: View {
                 
                 VStack(spacing: 6) {
                     Text("SimplePDF")
-                        .font(.title)
+                        .font(SimplePDFDesign.Typography.headline())
                         .fontWeight(.bold)
                     Text("Version 1.0")
-                        .font(.subheadline)
-                        .foregroundColor(.secondary)
+                        .font(SimplePDFDesign.Typography.body())
+                        .foregroundColor(SimplePDFDesign.ColorToken.secondaryText)
                 }
                 
                 Text("A sleek, lightweight PDF viewer for macOS.\nNo bloatware, no popups, and no subscription... ever.")
-                    .font(.body)
+                    .font(SimplePDFDesign.Typography.body())
                     .multilineTextAlignment(.center)
-                    .foregroundColor(.secondary)
+                    .foregroundColor(SimplePDFDesign.ColorToken.secondaryText)
                     .padding(.horizontal, 30)
                 
                 Divider().frame(width: 200)
@@ -284,8 +284,8 @@ struct SettingsView: View {
                 Spacer()
                 
                 Text("Created with ❤️ by Jonas")
-                    .font(.caption)
-                    .foregroundColor(.secondary)
+                    .font(SimplePDFDesign.Typography.label())
+                    .foregroundColor(SimplePDFDesign.ColorToken.secondaryText)
             }
             .padding(30)
             .tabItem {
@@ -319,12 +319,7 @@ struct SettingsView: View {
                     .frame(maxWidth: .infinity, alignment: .leading)
                     .padding(.horizontal, 16)
                     .padding(.vertical, 12)
-                    .background(Color(NSColor.controlBackgroundColor).opacity(0.4))
-                    .cornerRadius(8)
-                    .overlay(
-                        RoundedRectangle(cornerRadius: 8)
-                            .stroke(Color.gray.opacity(0.15), lineWidth: 1)
-                    )
+                    .simplePanel(padding: 0)
                     
                     // Section 2: Startup Behavior
                     VStack(alignment: .leading, spacing: 12) {
@@ -352,12 +347,7 @@ struct SettingsView: View {
                     .frame(maxWidth: .infinity, alignment: .leading)
                     .padding(.horizontal, 16)
                     .padding(.vertical, 12)
-                    .background(Color(NSColor.controlBackgroundColor).opacity(0.4))
-                    .cornerRadius(8)
-                    .overlay(
-                        RoundedRectangle(cornerRadius: 8)
-                            .stroke(Color.gray.opacity(0.15), lineWidth: 1)
-                    )
+                    .simplePanel(padding: 0)
                     
                     // Section 3: System Integration
                     VStack(alignment: .leading, spacing: 12) {
@@ -391,12 +381,7 @@ struct SettingsView: View {
                     .frame(maxWidth: .infinity, alignment: .leading)
                     .padding(.horizontal, 16)
                     .padding(.vertical, 12)
-                    .background(Color(NSColor.controlBackgroundColor).opacity(0.4))
-                    .cornerRadius(8)
-                    .overlay(
-                        RoundedRectangle(cornerRadius: 8)
-                            .stroke(Color.gray.opacity(0.15), lineWidth: 1)
-                    )
+                    .simplePanel(padding: 0)
                     
                     // Section 4: Presentation Mode
                     VStack(alignment: .leading, spacing: 12) {
@@ -451,12 +436,7 @@ struct SettingsView: View {
                     .frame(maxWidth: .infinity, alignment: .leading)
                     .padding(.horizontal, 16)
                     .padding(.vertical, 12)
-                    .background(Color(NSColor.controlBackgroundColor).opacity(0.4))
-                    .cornerRadius(8)
-                    .overlay(
-                        RoundedRectangle(cornerRadius: 8)
-                            .stroke(Color.gray.opacity(0.15), lineWidth: 1)
-                    )
+                    .simplePanel(padding: 0)
                     // Section 5: Backup & Restore
                     VStack(alignment: .leading, spacing: 12) {
                         Text("Backup & Restore")
@@ -488,12 +468,7 @@ struct SettingsView: View {
                     .frame(maxWidth: .infinity, alignment: .leading)
                     .padding(.horizontal, 16)
                     .padding(.vertical, 12)
-                    .background(Color(NSColor.controlBackgroundColor).opacity(0.4))
-                    .cornerRadius(8)
-                    .overlay(
-                        RoundedRectangle(cornerRadius: 8)
-                            .stroke(Color.gray.opacity(0.15), lineWidth: 1)
-                    )
+                    .simplePanel(padding: 0)
                     
                     // Section 6: Debugging
                     VStack(alignment: .leading, spacing: 12) {
@@ -530,12 +505,7 @@ struct SettingsView: View {
                     .frame(maxWidth: .infinity, alignment: .leading)
                     .padding(.horizontal, 16)
                     .padding(.vertical, 12)
-                    .background(Color(NSColor.controlBackgroundColor).opacity(0.4))
-                    .cornerRadius(8)
-                    .overlay(
-                        RoundedRectangle(cornerRadius: 8)
-                            .stroke(Color.gray.opacity(0.15), lineWidth: 1)
-                    )
+                    .simplePanel(padding: 0)
                     
                     // Section 7: Security
                     VStack(alignment: .leading, spacing: 12) {
@@ -558,12 +528,7 @@ struct SettingsView: View {
                     .frame(maxWidth: .infinity, alignment: .leading)
                     .padding(.horizontal, 16)
                     .padding(.vertical, 12)
-                    .background(Color(NSColor.controlBackgroundColor).opacity(0.4))
-                    .cornerRadius(8)
-                    .overlay(
-                        RoundedRectangle(cornerRadius: 8)
-                            .stroke(Color.gray.opacity(0.15), lineWidth: 1)
-                    )
+                    .simplePanel(padding: 0)
                 }
                 .padding(20)
             }
@@ -589,12 +554,7 @@ struct SettingsView: View {
                     }
                     .padding(.horizontal, 16)
                     .padding(.vertical, 12)
-                    .background(Color(NSColor.controlBackgroundColor).opacity(0.4))
-                    .cornerRadius(8)
-                    .overlay(
-                        RoundedRectangle(cornerRadius: 8)
-                            .stroke(Color.gray.opacity(0.15), lineWidth: 1)
-                    )
+                    .simplePanel(padding: 0)
                     
                     // Section 2: Navigation & Tools
                     VStack(alignment: .leading, spacing: 10) {
@@ -614,12 +574,7 @@ struct SettingsView: View {
                     }
                     .padding(.horizontal, 16)
                     .padding(.vertical, 12)
-                    .background(Color(NSColor.controlBackgroundColor).opacity(0.4))
-                    .cornerRadius(8)
-                    .overlay(
-                        RoundedRectangle(cornerRadius: 8)
-                            .stroke(Color.gray.opacity(0.15), lineWidth: 1)
-                    )
+                    .simplePanel(padding: 0)
                 }
                 .padding(20)
             }
@@ -747,39 +702,5 @@ struct SettingsView: View {
             setShortcut(backup.shortcut_inspector, key: "shortcut_inspector")
             setShortcut(backup.shortcut_presentation, key: "shortcut_presentation")
         }
-    }
-}
-
-extension Color {
-    init(hex: String) {
-        let hex = hex.trimmingCharacters(in: CharacterSet.alphanumerics.inverted)
-        var int: UInt64 = 0
-        Scanner(string: hex).scanHexInt64(&int)
-        let a, r, g, b: UInt64
-        switch hex.count {
-        case 3: // RGB (12-bit)
-            (a, r, g, b) = (255, (int >> 8) * 17, (int >> 4 & 0xF) * 17, (int & 0xF) * 17)
-        case 6: // RGB (24-bit)
-            (a, r, g, b) = (255, int >> 16, int >> 8 & 0xFF, int & 0xFF)
-        case 8: // ARGB (32-bit)
-            (a, r, g, b) = (int >> 24, int >> 16 & 0xFF, int >> 8 & 0xFF, int & 0xFF)
-        default:
-            (a, r, g, b) = (255, 0, 0, 0)
-        }
-        self.init(
-            .sRGB,
-            red: Double(r) / 255,
-            green: Double(g) / 255,
-            blue: Double(b) / 255,
-            opacity: Double(a) / 255
-        )
-    }
-
-    func toHex() -> String {
-        guard let components = NSColor(self).usingColorSpace(.deviceRGB) else { return "#FF0000" }
-        let r = Int(components.redComponent * 255)
-        let g = Int(components.greenComponent * 255)
-        let b = Int(components.blueComponent * 255)
-        return String(format: "#%02X%02X%02X", r, g, b)
     }
 }

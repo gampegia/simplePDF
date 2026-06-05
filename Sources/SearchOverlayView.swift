@@ -15,7 +15,7 @@ struct SearchOverlayView: View {
         HStack(spacing: 8) {
             // Search Icon
             Image(systemName: "magnifyingglass")
-                .foregroundColor(.secondary)
+                .foregroundColor(SimplePDFDesign.ColorToken.secondaryText)
             
             // Search Input Field
             TextField("Find in document...", text: $searchText)
@@ -32,8 +32,8 @@ struct SearchOverlayView: View {
                     .controlSize(.small)
             } else if !searchText.isEmpty {
                 Text(selections.isEmpty ? "0 of 0" : "\(currentIndex + 1) of \(selections.count)")
-                    .font(.caption)
-                    .foregroundColor(selections.isEmpty ? .red : .secondary)
+                    .font(SimplePDFDesign.Typography.label())
+                    .foregroundColor(selections.isEmpty ? .red : SimplePDFDesign.ColorToken.secondaryText)
             }
             
             Divider().frame(height: 16)
@@ -60,19 +60,14 @@ struct SearchOverlayView: View {
             // Close Button
             Button(action: closeSearch) {
                 Image(systemName: "xmark.circle.fill")
-                    .foregroundColor(.secondary)
+                    .foregroundColor(SimplePDFDesign.ColorToken.secondaryText)
             }
             .buttonStyle(.plain)
             .help("Close Search (Esc)")
         }
-        .padding(.horizontal, 12)
-        .padding(.vertical, 8)
-        .background(VisualEffectView(material: .hudWindow, blendingMode: .withinWindow).cornerRadius(8))
-        .overlay(
-            RoundedRectangle(cornerRadius: 8)
-                .stroke(Color.white.opacity(0.15), lineWidth: 1)
-        )
-        .shadow(color: Color.black.opacity(0.3), radius: 10, y: 5)
+        .padding(.horizontal, SimplePDFDesign.Space.md)
+        .padding(.vertical, SimplePDFDesign.Space.sm)
+        .simpleOverlay(radius: SimplePDFDesign.Radius.md)
         .onExitCommand {
             closeSearch()
         }

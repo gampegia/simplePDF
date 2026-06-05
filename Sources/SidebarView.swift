@@ -25,7 +25,7 @@ struct SidebarView: View {
                 Label("Outline", systemImage: "list.bullet").tag(1)
             }
             .pickerStyle(.segmented)
-            .padding(10)
+            .padding(SimplePDFDesign.Space.sm)
             
             Divider()
             
@@ -43,9 +43,9 @@ struct SidebarView: View {
                                         let pageH = bounds.height > 0 ? bounds.height : 1.0
                                         let aspectRatio = pageW / pageH
                                         
-                                        // Target a standard width of 110 points and scale height proportionally
                                         let thumbnailWidth: CGFloat = 110
                                         let thumbnailHeight = thumbnailWidth / aspectRatio
+                                        let isSelected = currentPage == index + 1
                                         
                                         VStack(spacing: 6) {
                                             Image(nsImage: page.thumbnail(of: NSSize(width: thumbnailWidth * 2.0, height: thumbnailHeight * 2.0), for: .mediaBox))
@@ -53,19 +53,26 @@ struct SidebarView: View {
                                                 .aspectRatio(contentMode: .fit)
                                                 .frame(width: thumbnailWidth, height: thumbnailHeight)
                                                 .background(Color.white)
-                                                .cornerRadius(4)
-                                                .shadow(color: Color.black.opacity(0.12), radius: 4, x: 0, y: 2)
+                                                .clipShape(RoundedRectangle(cornerRadius: SimplePDFDesign.Radius.xs, style: .continuous))
+                                                .shadow(
+                                                    color: SimplePDFDesign.Shadow.thumbnail.color,
+                                                    radius: SimplePDFDesign.Shadow.thumbnail.radius,
+                                                    x: SimplePDFDesign.Shadow.thumbnail.x,
+                                                    y: SimplePDFDesign.Shadow.thumbnail.y
+                                                )
                                                 .overlay(
-                                                    RoundedRectangle(cornerRadius: 4)
-                                                        .stroke(currentPage == index + 1 ? Color.accentColor : Color.secondary.opacity(0.2), lineWidth: currentPage == index + 1 ? 2.5 : 1)
+                                                    RoundedRectangle(cornerRadius: SimplePDFDesign.Radius.xs, style: .continuous)
+                                                        .stroke(isSelected ? SimplePDFDesign.ColorToken.accent : SimplePDFDesign.ColorToken.divider, lineWidth: isSelected ? SimplePDFDesign.Stroke.selected : SimplePDFDesign.Stroke.hairline)
                                                 )
                                             
                                             Text("\(index + 1)")
-                                                .font(.system(.caption, design: .monospaced))
-                                                .foregroundColor(currentPage == index + 1 ? .accentColor : .secondary)
-                                                .fontWeight(currentPage == index + 1 ? .bold : .regular)
+                                                .font(SimplePDFDesign.Typography.monoLabel())
+                                                .foregroundColor(isSelected ? SimplePDFDesign.ColorToken.accentStrong : SimplePDFDesign.ColorToken.secondaryText)
                                         }
-                                        .padding(.vertical, 4)
+                                        .padding(.vertical, SimplePDFDesign.Space.xs)
+                                        .padding(.horizontal, SimplePDFDesign.Space.sm)
+                                        .background(isSelected ? SimplePDFDesign.ColorToken.selectionFill.opacity(0.54) : Color.clear)
+                                        .clipShape(RoundedRectangle(cornerRadius: SimplePDFDesign.Radius.md, style: .continuous))
                                         .contentShape(Rectangle())
                                         .onTapGesture {
                                             currentPage = index + 1
@@ -76,9 +83,9 @@ struct SidebarView: View {
                                     }
                                 }
                             }
-                            .padding()
+                            .padding(SimplePDFDesign.Space.lg)
                         }
-                        .background(Color(NSColor.controlBackgroundColor))
+                        .background(SimplePDFDesign.ColorToken.panelSoft)
                     } else {
                         placeholderView(message: "No Document Loaded")
                     }
@@ -88,22 +95,20 @@ struct SidebarView: View {
                         // Outline Search Bar
                         HStack {
                             Image(systemName: "magnifyingglass")
-                                .foregroundColor(.secondary)
+                                .foregroundColor(SimplePDFDesign.ColorToken.secondaryText)
                             TextField("Search Outline...", text: $outlineSearchQuery)
                                 .textFieldStyle(.plain)
                             if !outlineSearchQuery.isEmpty {
                                 Button(action: { outlineSearchQuery = "" }) {
                                     Image(systemName: "xmark.circle.fill")
-                                        .foregroundColor(.secondary)
+                                        .foregroundColor(SimplePDFDesign.ColorToken.secondaryText)
                                 }
                                 .buttonStyle(.plain)
                             }
                         }
-                        .padding(6)
-                        .background(Color(NSColor.controlBackgroundColor))
-                        .cornerRadius(6)
-                        .padding([.horizontal, .top], 10)
-                        .padding(.bottom, 6)
+                        .simpleSearchFieldBackground()
+                        .padding([.horizontal, .top], SimplePDFDesign.Space.sm)
+                        .padding(.bottom, SimplePDFDesign.Space.sm)
                         
                         Divider()
                         
@@ -123,10 +128,10 @@ struct SidebarView: View {
                                         }) {
                                             HStack {
                                                 Image(systemName: "bookmark")
-                                                    .foregroundColor(.accentColor)
-                                                    .font(.caption)
+                                                    .foregroundColor(SimplePDFDesign.ColorToken.accent)
+                                                    .font(SimplePDFDesign.Typography.label())
                                                 Text(item.label)
-                                                    .font(.subheadline)
+                                                    .font(SimplePDFDesign.Typography.body())
                                                     .lineLimit(1)
                                             }
                                         }
@@ -153,8 +158,8 @@ struct SidebarView: View {
         VStack {
             Spacer()
             Text(message)
-                .font(.callout)
-                .foregroundColor(.secondary)
+                .font(SimplePDFDesign.Typography.body())
+                .foregroundColor(SimplePDFDesign.ColorToken.secondaryText)
             Spacer()
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)

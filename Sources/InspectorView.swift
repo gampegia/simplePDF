@@ -11,15 +11,16 @@ struct InspectorView: View {
             // Header
             HStack {
                 Text("Document Inspector")
-                    .font(.headline)
+                    .font(SimplePDFDesign.Typography.title())
+                    .foregroundColor(SimplePDFDesign.ColorToken.text)
                 Spacer()
                 Button("Done") {
                     isPresented = false
                 }
                 .keyboardShortcut(.defaultAction)
             }
-            .padding()
-            .background(Color(NSColor.windowBackgroundColor))
+            .padding(SimplePDFDesign.Space.lg)
+            .background(SimplePDFDesign.ColorToken.panelSoft)
             
             Divider()
             
@@ -54,13 +55,13 @@ struct InspectorView: View {
                             .frame(maxWidth: .infinity, alignment: .leading)
                         }
                     }
-                    .padding()
+                    .padding(SimplePDFDesign.Space.lg)
                 }
             } else {
                 VStack {
                     Spacer()
                     Text("No Document Loaded")
-                        .foregroundColor(.secondary)
+                        .foregroundColor(SimplePDFDesign.ColorToken.secondaryText)
                     Spacer()
                 }
             }
@@ -76,13 +77,13 @@ struct InspectorView: View {
         var body: some View {
             HStack(alignment: .top) {
                 Text(label)
-                    .font(.subheadline)
-                    .foregroundColor(.secondary)
+                    .font(SimplePDFDesign.Typography.body())
+                    .foregroundColor(SimplePDFDesign.ColorToken.secondaryText)
                     .frame(width: 100, alignment: .leading)
                 
                 Text(value)
-                    .font(.subheadline)
-                    .foregroundColor(.primary)
+                    .font(SimplePDFDesign.Typography.body())
+                    .foregroundColor(SimplePDFDesign.ColorToken.text)
                     .textSelection(.enabled)
                 Spacer()
             }

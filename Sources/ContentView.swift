@@ -57,25 +57,24 @@ struct WindowAccessor: NSViewRepresentable {
 // Brand logo view displaying "simple" on top and "PDF" on bottom
 struct BrandLogoView: View {
     let size: CGFloat
-    
+
     var body: some View {
         ZStack {
-            // Squircle background with a beautiful red gradient
             RoundedRectangle(cornerRadius: size * 0.22, style: .continuous)
                 .fill(
                     LinearGradient(
-                        colors: [Color(red: 0.95, green: 0.15, blue: 0.15), Color(red: 0.78, green: 0.05, blue: 0.05)],
+                        colors: [SimplePDFDesign.ColorToken.accent, SimplePDFDesign.ColorToken.accentStrong],
                         startPoint: .top,
                         endPoint: .bottom
                     )
                 )
                 .frame(width: size, height: size)
-                .shadow(color: Color.black.opacity(0.18), radius: size * 0.04, y: size * 0.02)
-            
+                .shadow(color: Color.black.opacity(0.16), radius: size * 0.035, y: size * 0.018)
+
             // Centered stacked lettering matching the redesigned App Icon
             VStack(spacing: size * 0.015) {
                 Text("simple")
-                    .font(.system(size: size * 0.115, weight: .medium, design: .default))
+                    .font(.system(size: size * 0.115, weight: .semibold, design: .default))
                     .foregroundColor(.white.opacity(0.9))
                 Text("PDF")
                     .font(.system(size: size * 0.22, weight: .black, design: .default))
@@ -90,7 +89,7 @@ enum ViewModeSelection: String, CaseIterable, Identifiable {
     case single
     case twoUp
     case presentation
-    
+
     var id: String { self.rawValue }
 }
 
@@ -99,61 +98,61 @@ struct ContentView: View {
     @State private var currentWindow: NSWindow? = nil
     @State private var registeredURL: URL? = nil
     @State private var shouldCloseWindow = false
-    
+
     // Timer to track tab bar button positions
     @State private var tabCheckTimer: Timer? = nil
-    
+
     // Environment action to programmatically open new windows (tabs)
     @Environment(\.openWindow) private var openWindow
-    
+
     // Sidebar visibility state
     @State private var columnVisibility: NavigationSplitViewVisibility = .all
-    
+
     // Search overlay state
     @State private var isSearchPresented = false
-    
+
     // Jump to page overlay state
     @State private var isJumpToPagePresented = false
-    
+
     // Metadata Inspector state
     @State private var isInspectorPresented = false
-    
+
     // Active loaded PDFDocument
     @State private var pdfDocument: PDFDocument? = nil
-    
+
     // Drag-and-drop state
     @State private var isDraggingOver = false
-    
+
     // Document and PDF View states
     @State private var currentPage: Int = 1
     @State private var totalPages: Int = 0
     @State private var scaleFactor: Double = 1.0
     @State private var autoScales: Bool = true
     @State private var displayMode: PDFDisplayMode = .singlePageContinuous
-    
+
     @AppStorage("sidebarWidth") private var sidebarWidth: Double = 250.0
     @AppStorage("shortcut_zoomFit") private var zoomFitShortcutData: Data?
     @AppStorage("maxPDFFileSizeMB") private var maxPDFFileSizeMB: Int = 250
-    
+
     // Presentation Mode states
     @State private var isPresentationMode = false
     @State private var savedDisplayMode: PDFDisplayMode = .singlePageContinuous
     @State private var savedAutoScales = true
     @State private var savedScaleFactor: Double = 1.0
     @State private var savedColumnVisibility: NavigationSplitViewVisibility = .all
-    
+
     @State private var currentPageRect: CGRect = .zero
-    
+
     // Presentation AppStorage customization keys
     @AppStorage("presentationShowProgressBar") private var showProgressBar: Bool = true
     @AppStorage("presentationProgressBarPosition") private var progressBarPosition: String = "bottom"
     @AppStorage("presentationProgressBarThickness") private var progressBarThickness: Double = 2.0
     @AppStorage("presentationProgressBarColor") private var progressBarHexColor: String = "#FF0000"
-    
+
     private var zoomFitShortcut: ShortcutConfig {
         ShortcutManager.getShortcut(forKey: "shortcut_zoomFit", defaultShortcut: ShortcutManager.defaultZoomFit)
     }
-    
+
     private var viewModeSelection: Binding<ViewModeSelection> {
         Binding<ViewModeSelection>(
             get: {
@@ -185,10 +184,10 @@ struct ContentView: View {
             }
         )
     }
-    
+
     // Shared CustomPDFView for this document window
     @State private var sharedPDFView = CustomPDFView()
-    
+
     var body: some View {
         Group {
             if let doc = pdfDocument {
@@ -225,8 +224,8 @@ struct ContentView: View {
                                 currentPageRect: $currentPageRect
                             )
                             .frame(maxWidth: .infinity, maxHeight: .infinity)
-                            .background(Color(NSColor.underPageBackgroundColor))
-                            
+                            .background(SimplePDFDesign.ColorToken.pdfBackground)
+
                             // Bottom Status Bar
                             if !isPresentationMode {
                                 StatusBarView(
@@ -239,7 +238,7 @@ struct ContentView: View {
                                 )
                             }
                         }
-                        
+
                         // Search HUD overlay
                         if isSearchPresented {
                             VStack {
@@ -254,7 +253,7 @@ struct ContentView: View {
                                 Spacer()
                             }
                         }
-                        
+
                         // Jump to Page HUD overlay
                         if isJumpToPagePresented {
                             VStack {
@@ -269,7 +268,7 @@ struct ContentView: View {
                                 Spacer()
                             }
                         }
-                        
+
                         // Presentation Progress Bar
                         if isPresentationMode && showProgressBar && currentPageRect != .zero {
                             GeometryReader { geo in
@@ -279,7 +278,7 @@ struct ContentView: View {
                                 let yOffset = progressBarPosition == "top" ?
                                     (geo.size.height - currentPageRect.maxY) :
                                     (geo.size.height - currentPageRect.minY - CGFloat(progressBarThickness))
-                                
+
                                 Rectangle()
                                     .fill(Color(hex: progressBarHexColor))
                                     .frame(width: width, height: CGFloat(progressBarThickness))
@@ -303,13 +302,13 @@ struct ContentView: View {
                         }
                         .pickerStyle(.segmented)
                         .help("Switch between Portrait, Spread, or Presentation mode")
-                        
+
                         // Toggle Search
                         Button(action: { isSearchPresented.toggle() }) {
                             Image(systemName: "magnifyingglass")
                         }
                         .help("Find Text (Cmd + F)")
-                        
+
                         // Show metadata details
                         Button(action: { isInspectorPresented.toggle() }) {
                             Image(systemName: "info.circle")
@@ -333,12 +332,12 @@ struct ContentView: View {
         .onAppear {
             loadPDF()
             restoreSavedSessionIfFirstWindow()
-            
+
             // Set up a periodic timer to find the new tab button and place the sort button next to it
             tabCheckTimer = Timer.scheduledTimer(withTimeInterval: 0.5, repeats: true) { _ in
                 setupTabBarButtons()
             }
-            
+
             // Register Apple Event handler for subsequent document opens
             if !AppleEventsHandler.hasRegistered {
                 AppleEventsHandler.hasRegistered = true
@@ -420,9 +419,9 @@ struct ContentView: View {
             guard let payload = notification.object as? SwapDocumentPayload,
                   let window = currentWindow,
                   let newURL = payload.assignments[window] else { return }
-            
+
             DLog("SwapDocumentURL: swapping to \(newURL.lastPathComponent) in window \(String(describing: currentWindow))")
-            
+
             // Directly load the new document (registry is pre-cleared by the sender)
             self.fileURL = newURL
             if let doc = PDFDocument(url: newURL) {
@@ -437,14 +436,14 @@ struct ContentView: View {
             } else {
                 DLog("SwapDocumentURL: FAILED to create PDFDocument from \(newURL.path)")
             }
-            
+
             // If this window now holds the previously-active URL, make it the selected tab
             if let activeURL = payload.activeURL,
                newURL.standardized.path == activeURL.standardized.path {
                 DLog("SwapDocumentURL: restoring active tab for \(newURL.lastPathComponent)")
                 window.makeKey()
             }
-            
+
             saveOpenDocuments()
         }
         // Expose search trigger to global command menu
@@ -511,7 +510,7 @@ struct ContentView: View {
             WindowAccessor(shouldClose: shouldCloseWindow) { window in
                 self.currentWindow = window
                 self.updateRegistry()
-                
+
                 // Suppress toolbar right-click context menu
                 if let toolbar = window.toolbar {
                     toolbar.allowsUserCustomization = false
@@ -522,7 +521,7 @@ struct ContentView: View {
                 if let superview = window.contentView?.superview {
                     superview.menu = nil
                 }
-                
+
                 if let url = fileURL {
                     if let existingWindow = OpenDocumentsRegistry.shared.window(showing: url), existingWindow != window {
                         existingWindow.makeKeyAndOrderFront(nil)
@@ -534,48 +533,48 @@ struct ContentView: View {
             }
         )
     }
-    
+
     private func enterPresentationMode() {
         guard let window = currentWindow else { return }
-        
+
         savedDisplayMode = displayMode
         savedAutoScales = autoScales
         savedScaleFactor = scaleFactor
         savedColumnVisibility = columnVisibility
-        
+
         displayMode = .singlePage
         autoScales = true
         columnVisibility = .detailOnly
         isPresentationMode = true
-        
+
         if !window.styleMask.contains(.fullScreen) {
             window.toggleFullScreen(nil)
         }
     }
-    
+
     private func exitPresentationMode() {
         guard isPresentationMode else { return }
         isPresentationMode = false
-        
+
         displayMode = savedDisplayMode
         autoScales = savedAutoScales
         scaleFactor = savedScaleFactor
         columnVisibility = savedColumnVisibility
-        
+
         if let window = currentWindow, window.styleMask.contains(.fullScreen) {
             window.toggleFullScreen(nil)
         }
     }
-    
+
     // Close the current tab, or return to the landing page if it is the last tab
     private func closeCurrentDocument() {
         guard pdfDocument != nil else { return } // Already on landing page
-        
+
         let currentWindow = self.currentWindow ?? NSApp.keyWindow
-        
+
         // Check how many tabs are in the current tab group
         let tabbedWindowCount = currentWindow?.tabGroup?.windows.count ?? 1
-        
+
         if tabbedWindowCount > 1 {
             // Multiple tabs: close this tab's window entirely
             currentWindow?.close()
@@ -591,7 +590,7 @@ struct ContentView: View {
             saveOpenDocuments()
         }
     }
-    
+
     // Sort tabs alphabetically by swapping PDF content between windows.
     // This avoids moving windows between tab positions entirely, which triggers
     // AppKit lifecycle events that cause splits, freezes, and ghost tabs.
@@ -599,7 +598,7 @@ struct ContentView: View {
     // is changed so that reading left-to-right produces alphabetical order.
     private func sortTabsAlphabetically() {
         DLog("sortTabsAlphabetically() called")
-        
+
         guard let window = currentWindow ?? NSApp.keyWindow else {
             DLog("sortTabsAlphabetically: no currentWindow or keyWindow")
             return
@@ -608,10 +607,10 @@ struct ContentView: View {
             DLog("sortTabsAlphabetically: window has no tabGroup")
             return
         }
-        
+
         let tabbedWindows = tabGroup.windows  // ordered left-to-right
         DLog("sortTabsAlphabetically: tabGroup has \(tabbedWindows.count) windows")
-        
+
         // Build mapping: window → current fileURL (via OpenDocumentsRegistry)
         let registry = OpenDocumentsRegistry.shared
         var windowURLPairs: [(NSWindow, URL)] = []
@@ -623,36 +622,36 @@ struct ContentView: View {
                 DLog("sortTabsAlphabetically: window[\(i)] → NO URL in registry (window=\(w))")
             }
         }
-        
+
         DLog("sortTabsAlphabetically: found \(windowURLPairs.count) windows with URLs out of \(tabbedWindows.count) total")
-        
+
         guard windowURLPairs.count == tabbedWindows.count else {
             DLog("sortTabsAlphabetically: not all windows have URLs, aborting")
             return
         }
-        
+
         // Sort URLs alphabetically by filename using natural/numeric comparison
         // so "Lesson 3" sorts before "Lesson 10"
         let sortedURLs = windowURLPairs
             .map { $0.1 }
             .sorted { $0.lastPathComponent.localizedStandardCompare($1.lastPathComponent) == .orderedAscending }
-        
+
         // Check if already sorted
         let currentURLs = windowURLPairs.map { $0.1 }
         let currentPaths = currentURLs.map({ $0.standardized.path })
         let sortedPaths = sortedURLs.map({ $0.standardized.path })
         DLog("sortTabsAlphabetically: current order = \(currentURLs.map { $0.lastPathComponent })")
         DLog("sortTabsAlphabetically: sorted order  = \(sortedURLs.map { $0.lastPathComponent })")
-        
+
         guard sortedPaths != currentPaths else {
             DLog("sortTabsAlphabetically: already sorted, nothing to do")
             return
         }
-        
+
         // Remember which URL is currently active so we can re-select it after the swap
         let activeURL = self.fileURL
         DLog("sortTabsAlphabetically: active URL = \(activeURL?.lastPathComponent ?? "nil")")
-        
+
         // Build the batch assignment map: window → new URL
         var assignments: [NSWindow: URL] = [:]
         for (index, w) in tabbedWindows.enumerated() {
@@ -660,16 +659,16 @@ struct ContentView: View {
             assignments[w] = sortedURLs[index]
             DLog("sortTabsAlphabetically: window[\(index)] ← \(sortedURLs[index].lastPathComponent)")
         }
-        
+
         // Clear all URLs from the registry first to prevent conflicts during swap
         for (_, url) in windowURLPairs {
             registry.unregister(url: url)
         }
         DLog("sortTabsAlphabetically: cleared registry")
-        
+
         // Animate: fade out → swap → fade in
         let contentViews = tabbedWindows.compactMap { $0.contentView }
-        
+
         // Phase 1: Fade out
         NSAnimationContext.runAnimationGroup({ context in
             context.duration = 0.15
@@ -684,7 +683,7 @@ struct ContentView: View {
                 name: Notification.Name("SwapDocumentURL"),
                 object: SwapDocumentPayload(assignments: assignments, activeURL: activeURL)
             )
-            
+
             // Phase 3: Fade back in
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.05) {
                 NSAnimationContext.runAnimationGroup({ context in
@@ -698,11 +697,11 @@ struct ContentView: View {
             DLog("sortTabsAlphabetically: done")
         })
     }
-    
+
     // Dynamically inject the sort button next to the native plus button on the AppKit tab bar
     private func setupTabBarButtons() {
         guard let window = currentWindow ?? NSApp.keyWindow else { return }
-        
+
         // Suppress toolbar right-click context menu
         if let toolbar = window.toolbar {
             if toolbar.allowsUserCustomization {
@@ -717,7 +716,7 @@ struct ContentView: View {
         if let superview = window.contentView?.superview, superview.menu != nil {
             superview.menu = nil
         }
-        
+
         func findNewTabButton(in view: NSView) -> NSView? {
             let className = String(describing: type(of: view))
             if className.contains("NewTabButton") || className.contains("TabBarNewTabButton") {
@@ -730,11 +729,11 @@ struct ContentView: View {
             }
             return nil
         }
-        
+
         guard let frameView = window.contentView?.superview,
               let newTabButton = findNewTabButton(in: frameView),
               let container = newTabButton.superview else { return }
-              
+
         // Find or create the sort button
         let sortBtn: NSButton
         if let existing = container.subviews.first(where: { $0.identifier?.rawValue == "SimplePDFSortButton" }) as? NSButton {
@@ -742,7 +741,7 @@ struct ContentView: View {
         } else {
             sortBtn = NSButton(image: NSImage(systemSymbolName: "arrow.up.arrow.down", accessibilityDescription: "Sort Tabs")!, target: TabBarButtonTarget.shared, action: #selector(TabBarButtonTarget.sortTabs))
             sortBtn.identifier = NSUserInterfaceItemIdentifier("SimplePDFSortButton")
-            
+
             // Match the native look of the newTabButton (bezelStyle rawValue 16 is .inline)
             let asBtn = newTabButton as? NSButton
             sortBtn.bezelStyle = asBtn?.bezelStyle ?? NSButton.BezelStyle(rawValue: 16) ?? .inline
@@ -750,30 +749,30 @@ struct ContentView: View {
             if let asBtn = asBtn {
                 sortBtn.controlSize = asBtn.controlSize
             }
-            
+
             sortBtn.translatesAutoresizingMaskIntoConstraints = false
             if let img = sortBtn.image {
                 img.isTemplate = true
             }
             container.addSubview(sortBtn)
         }
-        
+
         // Check if newTabButton has active trailing constraints to container
         let hasTrailingConstraints = container.constraints.contains { c in
             let isFirst = c.firstItem === newTabButton && (c.firstAttribute == .trailing || c.firstAttribute == .right)
             let isSecond = c.secondItem === newTabButton && (c.secondAttribute == .trailing || c.secondAttribute == .right)
             return isFirst || isSecond
         }
-        
+
         // If sortBtn already exists and newTabButton's trailing constraint is already deactivated,
         // we only need to update isHidden and return early.
         if container.subviews.contains(sortBtn) && !hasTrailingConstraints {
             sortBtn.isHidden = newTabButton.isHidden
             return
         }
-        
+
         sortBtn.isHidden = newTabButton.isHidden
-        
+
         // Find and deactivate any trailing constraints on newTabButton so we can place sortBtn to its right
         var trailingConstraints: [NSLayoutConstraint] = []
         for c in container.constraints {
@@ -783,20 +782,20 @@ struct ContentView: View {
                 trailingConstraints.append(c)
             }
         }
-        
+
         // Remove existing sort button constraints to prevent duplicate/conflicting constraints
         let existingSortConstraints = container.constraints.filter {
             $0.firstItem === sortBtn || $0.secondItem === sortBtn
         }
-        
+
         if !existingSortConstraints.isEmpty {
             container.removeConstraints(existingSortConstraints)
         }
-        
+
         if !trailingConstraints.isEmpty {
             NSLayoutConstraint.deactivate(trailingConstraints)
         }
-        
+
         // Activate new constraints: sortBtn to the right of newTabButton, matching its size, and sortBtn pinned to the trailing edge
         NSLayoutConstraint.activate([
             sortBtn.leadingAnchor.constraint(equalTo: newTabButton.trailingAnchor, constant: 6),
@@ -806,29 +805,30 @@ struct ContentView: View {
             sortBtn.trailingAnchor.constraint(equalTo: container.trailingAnchor, constant: -12)
         ])
     }
-    
+
     // Landing page view
     private var landingPageView: some View {
-        VStack(spacing: 25) {
-            // App Branding Logo
-            BrandLogoView(size: 120)
-                .padding(.bottom, 10)
-            
-            VStack(spacing: 8) {
-                Text("Simple PDF")
-                    .font(.system(size: 32, weight: .bold, design: .rounded))
-                    .foregroundColor(.primary)
-                
-                Text("Crisp, Fast, & Distraction-Free")
-                    .font(.title3)
-                    .fontWeight(.medium)
-                    .foregroundColor(.secondary)
-                
-                Text("Drag and drop a PDF file here or select one to begin")
-                    .font(.subheadline)
-                    .foregroundColor(.secondary)
+        VStack(spacing: SimplePDFDesign.Space.xl) {
+            BrandLogoView(size: 112)
+
+            VStack(spacing: SimplePDFDesign.Space.sm) {
+                Text("SimplePDF")
+                    .font(SimplePDFDesign.Typography.headline())
+                    .foregroundColor(SimplePDFDesign.ColorToken.text)
+
+                Text("A focused PDF workspace for tabs, windows, and presentations.")
+                    .font(SimplePDFDesign.Typography.body())
+                    .foregroundColor(SimplePDFDesign.ColorToken.secondaryText)
+                    .multilineTextAlignment(.center)
+                    .frame(maxWidth: 360)
+
+                HStack(spacing: SimplePDFDesign.Space.sm) {
+                    landingBadge("Tabs")
+                    landingBadge("Search")
+                    landingBadge("Present")
+                }
             }
-            
+
             Button("Choose PDF...") {
                 selectPDFFile()
             }
@@ -837,23 +837,24 @@ struct ContentView: View {
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .background(
-            RoundedRectangle(cornerRadius: 16)
+            RoundedRectangle(cornerRadius: SimplePDFDesign.Radius.xl, style: .continuous)
                 .strokeBorder(
-                    isDraggingOver ? Color.accentColor : Color.secondary.opacity(0.2),
+                    isDraggingOver ? SimplePDFDesign.ColorToken.accent : SimplePDFDesign.ColorToken.divider,
                     style: StrokeStyle(lineWidth: 2, dash: [8])
                 )
-                .background(isDraggingOver ? Color.accentColor.opacity(0.03) : Color.clear)
-                .padding(30)
+                .background(isDraggingOver ? SimplePDFDesign.ColorToken.selectionFill.opacity(0.72) : SimplePDFDesign.ColorToken.background)
+                .clipShape(RoundedRectangle(cornerRadius: SimplePDFDesign.Radius.xl, style: .continuous))
+                .padding(SimplePDFDesign.Space.xxl)
         )
         // Drag and drop registration
         .onDrop(of: [UTType.fileURL], isTargeted: $isDraggingOver) { providers in
             guard !providers.isEmpty else { return false }
-            
+
             for provider in providers {
                 provider.loadItem(forTypeIdentifier: UTType.fileURL.identifier, options: nil) { item, error in
                     guard let data = item as? Data,
                           let url = URL(dataRepresentation: data, relativeTo: nil) else { return }
-                    
+
                     if url.pathExtension.lowercased() == "pdf" {
                         guard let resolved = self.validateAndResolvePDF(url: url) else {
                             DispatchQueue.main.async {
@@ -878,14 +879,24 @@ struct ContentView: View {
             return true
         }
     }
-    
+
+    private func landingBadge(_ text: String) -> some View {
+        Text(text)
+            .font(SimplePDFDesign.Typography.label())
+            .foregroundColor(SimplePDFDesign.ColorToken.accentStrong)
+            .padding(.horizontal, SimplePDFDesign.Space.sm)
+            .padding(.vertical, SimplePDFDesign.Space.xs)
+            .background(SimplePDFDesign.ColorToken.selectionFill)
+            .clipShape(Capsule())
+    }
+
     private func loadPDF() {
         guard let url = fileURL else {
             pdfDocument = nil
             updateRegistry()
             return
         }
-        
+
         guard let resolvedURL = validateAndResolvePDF(url: url) else {
             let alert = NSAlert()
             alert.messageText = "Invalid PDF File"
@@ -897,7 +908,7 @@ struct ContentView: View {
             updateRegistry()
             return
         }
-        
+
         // If the URL was resolved (e.g. iCloud placeholder was downloaded), update fileURL and restart the load
         if url != resolvedURL {
             DispatchQueue.main.async {
@@ -905,7 +916,7 @@ struct ContentView: View {
             }
             return
         }
-        
+
         if let window = currentWindow {
             if focusWindow(showing: resolvedURL, excluding: window) {
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
@@ -919,7 +930,7 @@ struct ContentView: View {
                 return
             }
         }
-        
+
         if let doc = PDFDocument(url: resolvedURL) {
             doc.delegate = sharedPDFView
             self.pdfDocument = doc
@@ -928,14 +939,14 @@ struct ContentView: View {
             self.updateRegistry()
         }
     }
-    
+
     // Choose file dialog
     private func selectPDFFile() {
         let panel = NSOpenPanel()
         panel.allowsMultipleSelection = true
         panel.canChooseDirectories = false
         panel.allowedContentTypes = [.pdf]
-        
+
         if panel.runModal() == .OK {
             for url in panel.urls {
                 guard let resolved = self.validateAndResolvePDF(url: url) else { continue }
@@ -950,14 +961,14 @@ struct ContentView: View {
             }
         }
     }
-    
+
     // Open new PDF as tab (Cmd+O) — loads in current window if empty, else new tab
     private func openNewPDF() {
         let panel = NSOpenPanel()
         panel.allowsMultipleSelection = true
         panel.canChooseDirectories = false
         panel.allowedContentTypes = [.pdf]
-        
+
         if panel.runModal() == .OK {
             for url in panel.urls {
                 guard let resolved = self.validateAndResolvePDF(url: url) else { continue }
@@ -972,14 +983,14 @@ struct ContentView: View {
             }
         }
     }
-    
+
     // Open new PDF in a completely separate window (Cmd+N)
     private func openNewPDFInNewWindow() {
         let panel = NSOpenPanel()
         panel.allowsMultipleSelection = true
         panel.canChooseDirectories = false
         panel.allowedContentTypes = [.pdf]
-        
+
         if panel.runModal() == .OK {
             let validURLs = panel.urls.compactMap { url -> URL? in
                 if let resolved = self.validateAndResolvePDF(url: url), !focusWindow(showing: resolved) {
@@ -989,7 +1000,7 @@ struct ContentView: View {
             }
             if let firstURL = validURLs.first {
                 openWindow(value: firstURL)
-                
+
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
                     if let newWindow = NSApplication.shared.windows.last(where: { $0.isVisible && $0.canBecomeKey }) {
                         newWindow.tabbingMode = .disallowed
@@ -998,7 +1009,7 @@ struct ContentView: View {
                         if let tabGroup = newWindow.tabGroup, !tabGroup.isTabBarVisible {
                             newWindow.toggleTabBar(nil)
                         }
-                        
+
                         for url in validURLs.dropFirst() {
                             self.openWindow(value: url)
                         }
@@ -1007,14 +1018,14 @@ struct ContentView: View {
             }
         }
     }
-    
+
     // Restore session of PDF documents
     private func restoreSavedSessionIfFirstWindow() {
         guard fileURL == nil else { return }
-        
+
         let shouldRestore = UserDefaults.standard.object(forKey: "RestoreSessionOnLaunch") as? Bool ?? true
         guard shouldRestore else { return }
-        
+
         // Find visible application windows to determine if we are the first window
         let otherWindows = NSApplication.shared.windows.filter {
             $0.isVisible &&
@@ -1023,7 +1034,7 @@ struct ContentView: View {
             $0.canBecomeKey
         }
         guard otherWindows.count <= 1 else { return }
-        
+
         if let paths = UserDefaults.standard.stringArray(forKey: "OpenPDFPaths"), !paths.isEmpty {
             // Load the first saved document in the current window
             let firstPath = paths[0]
@@ -1032,7 +1043,7 @@ struct ContentView: View {
                 self.fileURL = firstURL
                 self.loadPDF()
             }
-            
+
             // Open the remaining documents in new tab windows
             if paths.count > 1 {
                 for i in 1..<paths.count {
@@ -1045,27 +1056,27 @@ struct ContentView: View {
             }
         }
     }
-    
+
     private func updateRegistry() {
         guard let window = currentWindow else { return }
-        
+
         // Unregister old URL if it changed
         if let oldURL = registeredURL, oldURL != fileURL {
             OpenDocumentsRegistry.shared.unregister(url: oldURL)
             registeredURL = nil
         }
-        
+
         // Register new URL
         if let newURL = fileURL {
             OpenDocumentsRegistry.shared.register(window: window, for: newURL)
             registeredURL = newURL
         }
     }
-    
+
     private func validateAndResolvePDF(url: URL) -> URL? {
         var resolvedURL: URL? = nil
         var coordinationError: NSError?
-        
+
         // Use NSFileCoordinator to ensure iCloud files are downloaded and accessible
         let coordinator = NSFileCoordinator(filePresenter: nil)
         coordinator.coordinate(readingItemAt: url, options: .withoutChanges, error: &coordinationError) { readURL in
@@ -1077,7 +1088,7 @@ struct ContentView: View {
                     return
                 }
             }
-            
+
             // 2. Check Magic Bytes ("%PDF-")
             guard let fileHandle = try? FileHandle(forReadingFrom: readURL) else {
                 print("Validation failed: Could not open file handle")
@@ -1091,12 +1102,12 @@ struct ContentView: View {
                 print("Validation failed: Invalid magic bytes")
             }
         }
-        
+
         if let error = coordinationError {
             print("Validation failed: File coordination error: \(error.localizedDescription)")
             return nil
         }
-        
+
         return resolvedURL
     }
 }

@@ -16,22 +16,22 @@ struct PageJumpOverlayView: View {
             HStack(spacing: 8) {
                 // Book/Page Icon
                 Image(systemName: "doc.text.fill")
-                    .foregroundColor(.accentColor)
+                    .foregroundColor(SimplePDFDesign.ColorToken.accent)
                     .font(.title3)
                 
                 VStack(alignment: .leading, spacing: 2) {
                     Text("Go to Page")
-                        .font(.headline)
+                        .font(SimplePDFDesign.Typography.title())
                     Text("Enter page between 1 and \(totalPages)")
-                        .font(.caption)
-                        .foregroundColor(.secondary)
+                        .font(SimplePDFDesign.Typography.label())
+                        .foregroundColor(SimplePDFDesign.ColorToken.secondaryText)
                 }
                 Spacer()
                 
                 // Close button
                 Button(action: closeOverlay) {
                     Image(systemName: "xmark.circle.fill")
-                        .foregroundColor(.secondary)
+                        .foregroundColor(SimplePDFDesign.ColorToken.secondaryText)
                 }
                 .buttonStyle(.plain)
             }
@@ -40,10 +40,10 @@ struct PageJumpOverlayView: View {
                 // Text Field for input
                 TextField("Page #", text: $pageInput)
                     .textFieldStyle(.plain)
-                    .font(.system(size: 16, weight: .semibold, design: .rounded))
-                    .padding(8)
-                    .background(Color(NSColor.controlBackgroundColor).opacity(0.5))
-                    .cornerRadius(6)
+                    .font(.system(size: 16, weight: .semibold, design: .default))
+                    .padding(SimplePDFDesign.Space.sm)
+                    .background(SimplePDFDesign.ColorToken.panel)
+                    .clipShape(RoundedRectangle(cornerRadius: SimplePDFDesign.Radius.sm, style: .continuous))
                     .focused($isFieldFocused)
                     .onSubmit {
                         submitPage()
@@ -62,32 +62,27 @@ struct PageJumpOverlayView: View {
                 // Jump Action Button
                 Button(action: submitPage) {
                     Text("Go")
-                        .font(.subheadline)
+                        .font(SimplePDFDesign.Typography.body())
                         .fontWeight(.semibold)
                         .foregroundColor(.white)
                         .padding(.horizontal, 16)
                         .padding(.vertical, 8)
-                        .background(Color.accentColor)
-                        .cornerRadius(6)
+                        .background(SimplePDFDesign.ColorToken.accent)
+                        .clipShape(RoundedRectangle(cornerRadius: SimplePDFDesign.Radius.sm, style: .continuous))
                 }
                 .buttonStyle(.plain)
             }
             
             if showError {
                 Text("Please enter a valid page number")
-                    .font(.caption)
+                    .font(SimplePDFDesign.Typography.label())
                     .foregroundColor(.red)
                     .transition(.opacity)
             }
         }
-        .padding(16)
+        .padding(SimplePDFDesign.Space.lg)
         .frame(width: 280)
-        .background(VisualEffectView(material: .hudWindow, blendingMode: .withinWindow).cornerRadius(12))
-        .overlay(
-            RoundedRectangle(cornerRadius: 12)
-                .stroke(Color.white.opacity(0.15), lineWidth: 1)
-        )
-        .shadow(color: Color.black.opacity(0.3), radius: 12, y: 6)
+        .simpleOverlay(radius: SimplePDFDesign.Radius.lg)
         .onExitCommand {
             closeOverlay()
         }

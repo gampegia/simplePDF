@@ -1,0 +1,44 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-06-05T00:00:00Z",
+  "title": "Design System: SimplePDF",
+  "extensions": {
+    "colorMeta": {
+      "accent-red": {
+        "role": "primary",
+        "displayName": "Simple Red",
+        "canonical": "#D73535",
+        "tonalRamp": ["#FCEAEA", "#F4BABA", "#D73535", "#B91F2A"]
+      },
+      "neutral": {
+        "role": "neutral",
+        "displayName": "Mac Workspace Neutral",
+        "canonical": "#F5F5F7",
+        "tonalRamp": ["#FFFFFF", "#F5F5F7", "#F0F1F4", "#D7D8DE", "#5E6066", "#1D1D1F"]
+      }
+    },
+    "typographyMeta": {
+      "headline": {
+        "displayName": "Headline",
+        "purpose": "Landing and sheet titles only."
+      },
+      "body": {
+        "displayName": "Body",
+        "purpose": "Controls, settings, and metadata."
+      },
+      "mono": {
+        "displayName": "Mono Label",
+        "purpose": "Page, zoom, and dimension values."
+      }
+    },
+    "elevation": {
+      "flatWorkspace": "Persistent chrome uses tonal layering, not shadows.",
+      "popoverShadow": "0 8px 24px rgba(0,0,0,0.18)",
+      "thumbnailShadow": "0 2px 6px rgba(0,0,0,0.12)"
+    },
+    "themeReadiness": {
+      "rule": "Views should consume SimplePDFDesign tokens. Future skins can replace PDFThemePalette values without rewriting view layout.",
+      "themeableFields": ["accent", "accentStrong", "background", "panel", "panelSoft", "divider", "selectionFill", "text", "secondaryText"]
+    }
+  }
+}
